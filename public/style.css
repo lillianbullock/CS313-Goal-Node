@@ -1,0 +1,110 @@
+/*  https://coolors.co/6f2dbd-b28fdc-efefff-88bbff-171717 */
+
+
+body {
+    background-color: #EFEFFF;
+    
+}
+
+header {
+    font-family: fantasy, arial, 'sans serif';
+    font-weight: bolder;
+    text-align:center;
+    
+    margin:auto;
+    width: 75%;
+    padding: 10px;
+
+}
+
+span {
+    text-align:center;
+    margin:auto;
+
+}
+
+span.title {
+    font-size:24px;
+}
+
+span.error {
+    color: red;
+    visibility: hidden;
+}
+
+.l-blue {
+    background-color: #88BBFF;
+}
+
+.purple {
+    background-color: #B28FDC;
+}
+
+table.centre {
+    margin:auto;
+}
+
+form.centre {
+    width: 25%;
+    margin:auto;
+}
+
+div.centre {
+    margin: auto;
+    width: 75%;
+    padding: 10px;
+}
+
+footer {
+    padding-top: 20px;
+    font-size: 15px;
+}
+
+.purplebutton {
+    background-color: #B28FDC;
+    border: none;
+    text-align: center;
+}
+
+div.rightFloat {
+    float: right;
+    width: 20%
+}
+
+/*table formatting*/
+table {
+    border-collapse: collapse;
+}
+
+table, th, td {
+    border: 1px solid black;
+    padding: 5px;
+}
+
+
+
+
+
+
+
+
+
+
+
+
+p {
+    margin-top: 0;
+}
+
+span.h2 {
+    font-weight: bold;
+    font-size:18px;
+}
+
+
+img {
+    /*max-width: 100%;*/
+    height: auto;
+    margin: auto;
+    width:40%;
+}  

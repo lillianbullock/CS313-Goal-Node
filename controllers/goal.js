@@ -1,5 +1,5 @@
 
-function getPiTypes(req, res) {
+/*function getPiTypes(req, res) {
     const pieResults = [
         {id: 12,  type: "pumpkin"},
         {id: 342, type: "cherry"},
@@ -8,9 +8,9 @@ function getPiTypes(req, res) {
     ];
 
     res.json(pieResults);
-}
+}*/
 
-function getPi(req, res) {
+/*function getPi(req, res) {
     const id = req.params.id;
     console.log(`request for pi with id : ${id}`);
 
@@ -23,29 +23,26 @@ function getPi(req, res) {
     };
 
     res.json(result);
-}
+}*/
 
-function createPie(req, res) {
+function createGoal(req, res) {
     console.log("creating a pi");
 
-    const type = req.body.type;
-    const quantity = req.body.quantity;
-    const calories = req.body.calories;
+    const freq = req.body.frequency;
+    const name = req.body.name;
+    //const calories = req.body.calories;
 
-    console.log(`type: ${type} quan: ${quantity} calories: ${calories}`);
+    console.log(`name: ${name} freq: ${freq}`);
 
     const result = {
           id:3
-        , type: type
-        , quantity: quantity
-        , calories: calories
+        , name: name
+        , frequency:freq
     };
     
     res.json(result);
 }
 
 module.exports = {
-      getPiTypes: getPiTypes
-    , getPi: getPi
-    , createPi: createPie
+    createGoal: createGoal
 };
