@@ -1,3 +1,8 @@
+require('dotenv').config();
+const connectionString = process.env.DATABASE_URL;
+
+const { Pool } = require('pg')
+const pool = new Pool({connectionString: connectionString});
 
 /*function getPiTypes(req, res) {
     const pieResults = [
@@ -34,6 +39,18 @@ function createGoal(req, res) {
 
     console.log(`name: ${name} freq: ${freq}`);
 
+    const q = `INSERT INTO goal 
+        ( name
+        , entry_type
+        , frequency_type
+        , owner) 
+        VALUES 
+        ( $1, $2 , $3, 1 );`
+
+    pool.query(q, [name, freq, 4])
+        //.then(res => console.log('user:', res.rows[0]))
+        .catch(e => setImmediate(() => { throw e }));
+
     const result = {
           id:3
         , name: name
@@ -43,6 +60,33 @@ function createGoal(req, res) {
     res.json(result);
 }
 
+function selectUserGoals(req, res) {
+    user_id = 1; // TODO change when session
+
+    console.log(`querying goals for user ${user_id}`);
+
+    const q = `select name
+                    , entry_type
+                    , frequency_type 
+                    FROM goal 
+                    WHERE owner = $1;`
+
+    pool.query(q, [user_id])
+        .then(result => res.json(result.rows))
+        .catch(e => setImmediate(() => { throw e }));
+
+    /*const result = {
+          id:3
+        , name: name
+        , frequency:freq
+    };
+    
+    res.json(result);*/
+}
+
+/******************
+******************/
 module.exports = {
-    createGoal: createGoal
+      createGoal: createGoal
+    , selectUserGoals: selectUserGoals
 };
