@@ -1,12 +1,12 @@
-//var baseURL = "http://localhost:5000";
-var baseURL = "https://vast-spire-48779.herokuapp.com";
+var baseURL = "http://localhost:5000";
+//var baseURL = "https://vast-spire-48779.herokuapp.com";
 
 function createEntry() {
     var input = document.getElementById('input').value;
     var goal_id = document.getElementById('goal_id').value;
     //var date = document.getElementById('date').value;
 
-    var searchURL = baseURL + `/createEntry?id=${goal_id}&input=${input}&date=${date}`;
+    var searchURL = baseURL + `/createEntry?id=${goal_id}&input=${input}`; //&date=${date}`;
     console.log(`createEntry => URL: ${searchURL}`);
   
     var xhttp = new XMLHttpRequest();
