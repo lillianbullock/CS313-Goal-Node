@@ -67,7 +67,7 @@ function createGoal(req, res) {
         VALUES 
         ( $1, $2 , $3, 1 );`
 
-    pool.query(q, [name, freq, entry])
+    pool.query(q, [name, entry, freq])
         //.then(res => console.log('user:', res.rows[0]))
         .catch(e => setImmediate(() => { throw e }));
 
