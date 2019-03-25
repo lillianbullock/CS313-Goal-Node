@@ -1,0 +1,38 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta http-equiv="X-UA-Compatible" content="ie=edge">
+    
+    <script src="../AJAX.js"></script>
+
+    <title>Goal List</title>
+</head>
+<body>
+    <h1><%= name %></h1>
+
+    Goals:
+    <pre id = "entries"><%= entries %></pre>
+
+    <b>New Goal</b>
+    <form action="create_goal" method="POST" class="centre"
+            onsubmit="return validateCreateGoal()" onreset="reseterrors()">
+        Goal name:
+        <input type="text" id="name"><br>
+    
+        <br>Frequency:
+        <select id="frequency">
+            <!-- TODO get the frequencies dynamically -->
+            <option value="5">Daily</option>
+            <option value="6">Weekly</option>
+        </select><br/>
+
+        Type:
+        <br/>
+
+        <br/><input type="button" onClick=createGoal() value="Create">
+    </form>
+
+</body>
+</html>

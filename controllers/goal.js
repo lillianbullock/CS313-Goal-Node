@@ -61,7 +61,7 @@ function createGoal(req, res) {
 }
 
 function selectUserGoals(req, res) {
-    user_id = 1; // TODO change when session
+    const user_id = 1; // TODO change when session
 
     console.log(`querying goals for user ${user_id}`);
 
@@ -84,9 +84,28 @@ function selectUserGoals(req, res) {
     res.json(result);*/
 }
 
+function selectGoal(req, res) {
+    // TODO check that the goal is allowed to be accessed by user
+    const goal_id = req.query.id;
+    const user_id = 1; // TODO change when session
+
+    console.log(`goal_id : ${goal_id}`);
+
+    // TODO add ability to see goal if it is shared with user
+    const q = `select name 
+                    FROM goal 
+                    WHERE goal_id = $1
+                    AND owner = $2;`
+
+    pool.query(q, [goal_id, user_id])
+        .then(result => res.json(result.rows))
+        .catch(e => setImmediate(() => { throw e }));
+}
+
 /******************
 ******************/
 module.exports = {
       createGoal: createGoal
     , selectUserGoals: selectUserGoals
+    , selectGoal: selectGoal
 };
