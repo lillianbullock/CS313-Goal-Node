@@ -1,5 +1,5 @@
-var baseURL = "http://localhost:5000";
-//var baseURL = "https://vast-spire-48779.herokuapp.com";
+//var baseURL = "http://localhost:5000";
+var baseURL = "https://vast-spire-48779.herokuapp.com";
 
 function createEntry() {
     var input = document.getElementById('input').value;
