@@ -17,36 +17,83 @@ function createEntry() {
             
             var entries = document.getElementById("entries");
 
-            entries.innerHTML += `Input: ${obj.input} \n`;
-            entries.innerHTML += `Timestamp: ${obj.timestamp} \n\n`;
+            // put it at the front
+            entries.innerHTML = `<b>Timestamp:</b> ${obj.timestamp} <br/><br/>` + entries.innerHTML;
+            entries.innerHTML = `<b>Input:</b> ${obj.input} <br/>` + entries.innerHTML;  
         }
     };
     xhttp.open("GET", searchURL, true);
-    xhttp.send();
-  
+    xhttp.send(); 
 }
 
 function createGoal() {
     var frequency = document.getElementById('frequency').value;
     var name = document.getElementById('name').value;
-    var entry = 4; //document.getElementById('date').value;
+    var entry = document.getElementById('entry').value;
 
-    var searchURL = baseURL + `/createGoal?name=${name}&frequency=${frequency}&entry=${entry}`;
+    if (name == "") {
+        console.log("blank name field");
+        return;
+    }
+
+    var searchURL = baseURL + `/createGoal?name=${name}&frequency=${frequency}`;
+    searchURL += `&entry=${entry}`;
     console.log(`createGoal => URL: ${searchURL}`);
 
     var xhttp = new XMLHttpRequest();
     xhttp.onreadystatechange = function() {
         if (this.readyState == 4 && this.status == 200) {
-            //console.log(`createEntry => returnVal: ${this.responseText}`);
-            //var obj = JSON.parse(this.responseText);
+            console.log(`createGoal => returnVal: ${this.responseText}`);
             
-            //var entries = document.getElementById("entries");
-
-            //entries.innerHTML += `Input: ${obj.input} \n`;
-            //entries.innerHTML += `Timestamp: ${obj.timestamp} \n\n`;
+            /*var obj = JSON.parse(this.responseText);
+            
+            var entries = document.getElementById("entries");
+*/
+            entries.innerHTML = `reload to see the new goal<br/><br/>` + entries.innerHTML;
+            //entries.innerHTML = `<b>entry_type:</b> ${obj.type} <br/>` + entries.innerHTML;
+            //entries.innerHTML = `<b>name:</b> ${obj.name} <br/>` + entries.innerHTML;
+            
         }
     };
     xhttp.open("GET", searchURL, true);
     xhttp.send();
+}
 
+function createUser() {
+
+    console.log(`entered function`);
+
+    var name = document.getElementById('name').value;
+    var email = document.getElementById('email').value;
+    var pass1 = document.getElementById('pass1').value;
+    var pass2 = document.getElementById('pass2').value;
+
+    if (!validateText('name', 'nameError') 
+            || !validateText('email', 'emailError') 
+            || !validatePass('pass1', 'pass2', 'passError')) {
+                console.log(`something wrong with data`);
+                return false;  // those functions take care of the err messages
+            }
+
+    var searchURL = baseURL + `/createUser?name=${name}&email=${email}&pass=${pass1}`;
+    console.log(`createUser => URL: ${searchURL}`);
+
+    var xhttp = new XMLHttpRequest();
+    xhttp.onreadystatechange = function() {
+        if (this.readyState == 4 && this.status == 200) {
+            console.log(`createUser => returnVal: ${this.responseText}`);
+            
+            var obj = JSON.parse(this.responseText);
+            var entries = document.getElementById("status");
+            
+            entries.innerHTML = `${obj.status}` + entries.innerHTML;            
+        }
+    };
+    xhttp.open("GET", searchURL, true);
+    xhttp.send();
+    return false; // keeps page from refreshing
+}
+
+function deleteGoal(id) {
+    alert(`goal ${id} cannot be deleted right now`);
 }

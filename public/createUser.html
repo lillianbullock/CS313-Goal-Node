@@ -1,0 +1,43 @@
+<!DOCTYPE html>
+<html lang = "en" >
+    <head>
+        <link rel="stylesheet" type="text/css" href="style.css">
+            <meta charset = "utf-8" />
+            <meta name="viewport" content="width=device-width, initial-scale=1">
+        <title>Entry</title>
+      
+        <!--internal style sheets-->
+        <style> </style>
+
+        <script src=validate.js> </script>
+        <script src=AJAX.js></script>
+    </head>
+    
+    <body>
+        <form onreset="reseterrors()">
+            Name:
+            <span id="nameError" class="error">Empty Field</span><br/>
+            <input type="text" id="name" name="name"
+            onchange="validateText('name', 'nameError')"><br>
+
+            Email:
+            <span id="emailError" class="error">Empty Field</span><br/>
+            <input type="email" id="email" name="email"
+            onchange="validateText('email', 'emailError')"><br/><br/>
+
+            Password:
+            <span id="passError" class="error">Password fields must match</span><br/>
+            <input type="password" id="pass1" name="pass1"><br/>
+
+            Verify Password: <br/>
+            <input type="password" id="pass2" name="pass2"
+            onchange="validatePass('pass1', 'pass2', 'passError')"><br/>
+
+            <div id="status"></div>
+
+            <br/><input type="button" value="Submit" onclick="createUser()">
+            <input type="reset" value="Reset"/>
+        </form>
+    
+    </body>
+</html>

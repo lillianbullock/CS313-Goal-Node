@@ -1,0 +1,29 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta http-equiv="X-UA-Compatible" content="ie=edge">
+    
+    <script
+    src="https://code.jquery.com/jquery-3.2.1.min.js"
+    integrity="sha256-hwg4gsxgFZhOsEEamdOYGBf13FyQuiTwlAQgxVSNgt4="
+    crossorigin="anonymous"></script>
+
+    <script src="../AJAX/login.js"></script>
+
+    <title>Login</title>
+</head>
+<body>
+    <div>
+        <b>Email: </b><input type="text" id="email"><br>
+        <b>Password: </b><input type="password" id="password"><br>
+        
+        <button onclick="login();">Log in</button>
+        <button onclick="logout();">Log out</button><br>
+        <br>
+        <div id="status"></div>
+    </div>
+
+</body>
+</html>

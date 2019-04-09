@@ -10,29 +10,31 @@
     <title>Goal List</title>
 </head>
 <body>
-    <h1><%= name %></h1>
+    <h1>Goals belonging to <i><%= name %></i></h1>
 
-    Goals:
-    <pre id = "entries"><%= entries %></pre>
-
-    <b>New Goal</b>
+    <h2>New Goal</h2>
     <form action="create_goal" method="POST" class="centre"
             onsubmit="return validateCreateGoal()" onreset="reseterrors()">
         Goal name:
         <input type="text" id="name"><br>
     
-        <br>Frequency:
+        Frequency:
         <select id="frequency">
-            <!-- TODO get the frequencies dynamically -->
-            <option value="5">Daily</option>
-            <option value="6">Weekly</option>
+            <%- freq_type %>
         </select><br/>
 
         Type:
-        <br/>
+        <select id="entry">
+            <%- entry_type %>
+        </select><br/>
 
-        <br/><input type="button" onClick=createGoal() value="Create">
+        <input type="button" onClick=createGoal() value="Create">
     </form>
+
+    <h2>Goals</h2>
+    <div id = "entries"><%- entries %></div>
+
+    
 
 </body>
 </html>

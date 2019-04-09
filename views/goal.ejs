@@ -10,16 +10,15 @@
     <title>Goal</title>
 </head>
 <body>
-    <h1><%= name %></h1>
+    <div>
+        <h1><%= name %></h1>
 
-    <p>Owner: <%= owner %></p>
-    <p>Frequency: <%= freq %></p>
-    <p>Entry Type: <%= entry_t %></p>
+        <b>Owner:</b> <%= owner %><br/>
+        <b>Frequency:</b> <%= freq %><br/>
+        <b>Entry Type:</b> <%= entry_t %><br/>
+    </div>
 
-    Entries:
-    <pre id = "entries"><%= entries %></pre>
-
-    <b>New Entry</b>
+    <h2>New Entry</h2>
     <form>
         Input:
         <input type="text" id="input"><br/>
@@ -27,8 +26,13 @@
         <input type="date" id = "date">-->
         <input type="hidden" id ="goal_id" value= <%= id %> >
         
-        <input type="button" onclick="createEntry()" value="Create">
+        <input type="button" onclick="createEntry()" value="create">
     </form>
+
+    <h2>Entries:</h2>
+    <div id = "entries">
+        <%- entries %>
+    </div>
 
 </body>
 </html>

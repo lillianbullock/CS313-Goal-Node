@@ -3,257 +3,163 @@ const app = express();
 
 const port = process.env.PORT || 5000;
 
+// to support JSON-encoded bodies
+app.use(express.json());
+// to support URL-encoded bodies
+app.use(express.urlencoded({extended:true})); 
+
+/**************************************
+* Database setup
+**************************************/
 require('dotenv').config();
 const connectionString = process.env.DATABASE_URL;
 
 const { Pool } = require('pg')
 const pool = new Pool({connectionString: connectionString});
 
-app.use(express.static("public"));
-
-// lets the post queries be easily read
-app.use(express.json());       // to support JSON-encoded bodies
-app.use(express.urlencoded({extended:true})); // to support URL-encoded bodies
-
-/******************
-* ejs stuff
-******************/
+/**************************************
+* set up ejs
+**************************************/
 app.set("views", "views");
 app.set("view engine", "ejs");
 
-/* Import this file  */
-//const controller = require("./controllers/goal.js");
+/**************************************
+* Session
+**************************************/
+var session = require('express-session');
 
-/******************
-* get and post paths
-******************/
+app.use(session({
+    secret: 'keyboard-cat'
+}));
+
+const bcrypt = require('bcrypt');
+
+/**************************************
+* My Libraries 
+**************************************/
+const create = require("./controllers/create.js");
+const select = require("./controllers/select.js");
+const userSes = require("./controllers/user.js");
+
+/**************************************
+* Routing
+**************************************/
+// public dir
+app.use(express.static("public"));
+
+// everything goes through this
+app.use(logRequest);
 
 // getting stuff from the db
-app.get("/goals", selectUserGoals);
-app.get("/goal/:id", selectGoal);
+app.get("/goals",    verifyLogin, select.userGoals);
+app.get("/goal/:id", verifyLogin, select.goal);
 
 // posting stuff to the db
 //app.post("/createGoal", createGoal);
 
 // receiving AJAX
-app.get("/createEntry", createEntry);
-app.get("/createGoal", createGoal);
+app.get("/createEntry", verifyLoginAJAX, create.entry);
+app.get("/createGoal",  verifyLoginAJAX, create.goal);
+app.get("/createUser", createUser)
 
+app.post('/login',  userSes.login);
+app.post('/logout', userSes.logout);
 
-
+/***************************************
+* Turn it on
+***************************************/
 app.listen(port, function() {
     console.log("Server listening on: " + port);
 });
 
-/******************
-* functions - eventually figure out how to move to controller file and deal 
-* with needed libraries
-******************/
+/***************************************
+* Middleware
+***************************************/
+function logRequest(req, res, next) {
+    console.log("Received a request for: " + req.url);
 
-function createGoal(req, res) {
-    
-    const freq = req.query.frequency;
-    const name = req.query.name;
-    const entry = req.query.entry;
-    //const calories = req.body.calories;
-
-    console.log(`createGoal() => name: ${name} freq: ${freq} entry: ${entry}`);
-
-    const q = `INSERT INTO goal 
-        ( name
-        , entry_type
-        , frequency_type
-        , owner) 
-        VALUES 
-        ( $1, $2 , $3, 1 );`
-
-    pool.query(q, [name, entry, freq])
-        //.then(res => console.log('user:', res.rows[0]))
-        .catch(e => setImmediate(() => { throw e }));
-
-    const result = {
-          id:3
-        , name: name
-        , frequency:freq
-    };
-    
-    res.json(result);
+    next();
 }
 
-function selectUserGoals(req, res) {
-    const user_id = 1; // TODO change when session
-
-    console.log(`selectUserGoals() => querying goals for user ${user_id}`);
-
-    const q = `select u.username
-                , g.name
-                , cl1.label as type
-                , cl2.label as frequency 
-                FROM goal g join common_lookup cl1 
-                ON g.entry_type = cl1.common_lookup_id 
-                JOIN common_lookup cl2 
-                ON g.frequency_type = cl2.common_lookup_id
-                JOIN usr u
-                ON g.owner = u.user_id
-                WHERE g.owner = $1;`
-
-   pool.query(q, [user_id], (err, result) => {
-        if (err) {
-            throw err
-        }
-        
-        console.log('selectGoal() => goals: ', result.rows);
-        
-        var entries = "";
-        result.rows.forEach((row) => {
-
-            entries += `name: ${row.name} \n`;
-            entries += `entry_type: ${row.type} \n`;
-            entries += `frequency: ${row.frequency} \n\n`;
-        });
-
-        1980-08-26
-
-        // EJS stuff
-        const params = {
-              name: result.rows[0].username
-            , entries: entries  
-        };
-    
-        res.render("goal_list", params);
-    });
-}
-
-function formatDate(datetime) {
-    var arr = ['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun',
-               'Jul', 'Aug', 'Sep', 'Oct', 'Nov', 'Dec'];
-
-    var dateStr = datetime.getDate() + " "+ arr[datetime.getMonth()] 
-                    + " " + datetime.getFullYear();
-
-    //console.log(`formatDate => date: ${dateStr}`);
-
-    return dateStr;
-}
-
-function selectGoal(req, res) {
-    const goal_id = req.params.id;
-    const user_id = 1; // TODO change when session
-
-    console.log(`selectGoal() => goal_id : ${goal_id}`);
-
-    // TODO add ability to see goal if it is shared with user
-    const q = `select goal_id
-                , name
-                , owner
-                , frequency_type
-                , entry_type
-                    FROM goal 
-                    WHERE goal_id = $1
-                    AND owner = $2;`
-
-    // now get the entries
-    pool.query(q, [goal_id, user_id], (err, result) => {
-        if (err) {
-            throw err
-        }
-        
-        console.log('selectGoal() => goal: ', result.rows[0]);
-        console.log('selectGoal() => name: ', result.rows[0].name);
-
-        const q2 = `select g_entry_id
-                , input
-                , timestamp
-                FROM goal_entry
-                WHERE goal_id = $1;`
-
-        pool.query(q2, [goal_id], (err2, result2) => {
-            if (err2) {
-                throw err2
-            }
-
-            console.log('selectGoal() => Goal Entries:', result2.rows);
-            
-            var entries = "";
-            result2.rows.forEach((row) => {
-
-                dateStr = formatDate(row.timestamp);
-
-                entries += `Input: ${row.input} \n`;
-                entries += `Timestamp: ${dateStr} \n\n`;
-            })
-
-            1980-08-26
-
-            // EJS stuff
-            const params = {
-                id: result.rows[0].goal_id
-                , name: result.rows[0].name
-                , entry_t: result.rows[0].entry_type
-                , freq: result.rows[0].frequency_type
-                , owner: result.rows[0].owner
-                , entries: entries  
-            };
-        
-            res.render("goal", params);
-
-        });
-    });
-}
-
-function createEntry(req, res) {
-    const goal_id = req.query.id;
-    const input = req.query.input;
-    // TODO add ability to change date
-
-    if (input == "")
+function verifyLoginAJAX(req, res, next) {
+    if (!(typeof req.session.user == 'undefined'))
     {
-        // stop here, bad data
-        res.status(500);
-        return;
-    }
-
-    // TODO check that the user has permissions to add an entry
-
-    const q = `Insert into goal_entry
-                ( goal_id
-                , input
-                , timestamp)
-                VALUES 
-                ( $1
-                , $2
-                , Now());`
-
-    pool.query(q, [goal_id, input], (err, result) => {
-        if (err) {
-            throw err
-        }
-
-        console.log('createEntry() => result:', result.rows);
-        
-        var now = new Date();
-        dateStr = formatDate(now);
-
-        const data = {
-              input: input
-            , timestamp: dateStr
-        };
-
-        res.json(data);
-
-        /*// EJS stuff
+        next();
+    } else {
         const params = {
-            id: result.rows[0].goal_id
-            , name: result.rows[0].name
-            , entry_t: result.rows[0].entry_type
-            , freq: result.rows[0].frequency_type
-            , owner: result.rows[0].owner
-            , entries: entries
-        };
+              status: 'failure'
+            , error: 'not logged in cannot access this page'
+        }; 
+
+        res.status(401);
+        res.json(params);
+    }
+}
+
+function verifyLogin(req, res, next) {
+    if (!(typeof req.session.user == 'undefined'))
+    {
+        next();
+    } else {
+        const params = {
+              status: 'failure'
+            , error: 'not logged in cannot access this page'
+        }; 
+
+        res.status(401);
+        res.json(params);
+
+        res.render(reroute, params);
+    }
+}
+
+/***************************************
+* Functions in progress
+***************************************/
+function createAccount() {
+    bcrypt.hash('myPassword', 10, function(err, hash) {
+        // Store hash in database
+        console.log(`login() => hash: ${hash}`)
+        
+        const q = `INSERT user_id
+            , password
+            FROM usr
+            WHERE email = $1;`;
     
-        res.render("goal", params);*/
 
     });
+      
+}
 
+function createUser(req, res) {
+    
+    const name = req.query.name;
+    const email = req.query.email;
+    const pass = req.query.pass;
 
+    console.log(`createGoal() => name: ${name} email: ${email}`);
+
+    bcrypt.hash(pass, 10, function(err, hash) {
+        // Store hash in database
+        console.log(`login() => hash: ${hash}`)
+
+        const q = `INSERT INTO usr 
+        ( username
+        , email
+        , password) 
+        VALUES 
+        ( $1, $2, $3);`;
+
+        var status = 'failure';
+
+        pool.query(q, [name, email, hash])
+            .then(result => {status = 'user created'})
+            .catch(e => setImmediate(() => { console.log(e)}));        
+
+        const result = {
+            status: status
+        };
+        
+        res.json(result);
+    });
 }
